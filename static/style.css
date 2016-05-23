@@ -1,0 +1,23 @@
+html,body{
+    background-color:#DDD
+}
+
+body{
+    text-align:center;
+    text-shadow:1px 1px 1px rgba(0,0,0,.5)
+}
+
+.c{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+}
+
+img.resize{x
+    height: auto; 
+    width: auto; 
+    max-width: 80%; 
+    max-height: 80%;
+    
+}

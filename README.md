@@ -1,4 +1,4 @@
-roulette web service for imgur
+go-imgurroulette
 =======
 > yep, it's basically what it sounds like
 

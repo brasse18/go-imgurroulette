@@ -4,7 +4,7 @@ go-imgurroulette
 
 This is a roulette server for imgur. By default it hosts itself on port 8080 over
 plain HTTP at localhost. If you want to turn this into a public-facing server, beware that
-you're not using an API of any kind - it's completely anonymous. This means
+you're not using an API of any kind, it's completely unauthenticated. This means
 that imgur might get mad. Since it's for personal use anyways, I don't care.
 You should also probably put it behind nginx and wrap everything in TLS or something.
 

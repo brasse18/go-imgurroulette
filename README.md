@@ -14,7 +14,7 @@ You should also probably put it behind nginx and wrap everything in TLS or somet
 - The binary is now installed in `~/.go/bin/`. Add it to your path, move it somewhere fun, I don't really care. Bare in mind it's using relative paths for assets and static, so you probably want to run it from its workspace (`~/.go/src/gitlab.com/Niesch/go-imgurroulette`) anyways, or modify the source to your liking.
 
 ## Running
-- See `go-imgurroulette --help` or `go-imgurroulette -h` for details
+- See `go-imgurroulette --help` or `go-imgurroulette -h` for details.
 - The `--workers` flag may increase performance massively. Higher values should be used with a larger `--cachesize`.
 - Generally, the `--workers` flag should be increased with multiple clients viewing. The `--cachesize` flag should generally be increased with faster viewers.
 - Imgur may ban you if you excessively use their services, it's probably in their ToS somewhere. I dunno, I don't read that shit.

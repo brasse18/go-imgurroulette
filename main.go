@@ -42,9 +42,11 @@ func main(){
 		os.Exit(0)
 	}
 
-	i := imgur.New("https://imgur.com/", "https://i.imgur.com/",".png", maxtries, minlength, maxlength, cachesize, *debug)
+	//conf := &
+	
+	i := imgur.New(&imgur.Config{DefaultFileExtension: ".png", AlbumBaseUrl: "https://imgur.com/", DirectBaseUrl: "https://i.imgur.com/", MaxTries: maxtries, MinLength: minlength, MaxLength: maxlength, CacheSize: cachesize, Debug: *debug})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		indexHandler(w, r, &i)
+		indexHandler(w, r, i)
 	})
 
 	go func(client *imgur.ImgurAnonymousClient){
@@ -56,7 +58,7 @@ func main(){
 			ilink := i.BuildImageLink(link)
 			client.CacheChan <- &imgur.ImgurResult{Link: ilink, Tries: tries}
 		}
-	}(&i)
+	}(i)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	http.ListenAndServe(":8080", nil)

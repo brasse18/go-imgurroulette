@@ -47,15 +47,12 @@ func (client ImgurAnonymousClient) FindValidGalleryLink() (string, int, error) {
 		rand.Seed(time.Now().UTC().UnixNano())
 		// We check against the "album" URL and not the direct file, since accessing a direct removed file will return 200 OK and removed.png.
 		l := (rand.Intn(client.maxLength+1 - client.minLength) + client.minLength)
-		if client.debug {
-			client.DebugLogger.Printf("Got random length %d\n", l)
-		}
 		s := randomString(l)
 		// yeah, don't hate me 
 		url := client.albumBaseURL + s
 		if client.CheckLink(url) == nil {
 			if client.debug {
-				client.DebugLogger.Println("Found valid image URL: " + url)
+				client.DebugLogger.Printf("Found valid image URL: %s\n", url)
 			}
 			return client.directBaseURL + s, i, nil
 		}
@@ -76,12 +73,12 @@ func (client ImgurAnonymousClient) CheckLink(url string) error {
 	}
 	if resp.StatusCode == 200 {
 		if client.debug {
-			client.DebugLogger.Println("Got 200 on URL " + url)
+			client.DebugLogger.Println("Found URL: %s\n", url)
 		}
 		return nil
 	} else {
 		if client.debug {
-			client.DebugLogger.Println("Got non-200 on " + url)
+			client.DebugLogger.Printf("Got status code %d on %s\n", resp.StatusCode, url)
 		}
 		return fmt.Errorf("error: Non-200 status code %d on URL %s", resp.StatusCode, url)
 	}

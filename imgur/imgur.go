@@ -21,14 +21,23 @@ type ImgurAnonymousClient struct {
 	minLength             int
 	maxLength             int
 	debug                 bool
+
+	CacheChan             chan *ImgurResult
 }
 
+type ImgurResult struct {
+	Link     string
+	Tries    int
+}
+
+
 // Returns a brand spankin' new ImgurAnonymousClient 
-func New(base, dbase, ext string, maxtries, minlength, maxlength int, dbg bool) (ImgurAnonymousClient) {
+func New(base, dbase, ext string, maxtries, minlength, maxlength, cachesize int, dbg bool) (ImgurAnonymousClient) {
 	il := log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
 	dl := log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
 	el := log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
-	return ImgurAnonymousClient{httpClient: http.Client{}, albumBaseURL: base, directBaseURL: dbase, defaultFileExtension: ext, InfoLogger: il, DebugLogger: dl, ErrorLogger: el, maxTries: maxtries, minLength: minlength, maxLength: maxlength, debug: dbg}
+	c := make(chan *ImgurResult, cachesize)
+	return ImgurAnonymousClient{httpClient: http.Client{}, albumBaseURL: base, directBaseURL: dbase, defaultFileExtension: ext, InfoLogger: il, DebugLogger: dl, ErrorLogger: el, maxTries: maxtries, minLength: minlength, maxLength: maxlength, debug: dbg, CacheChan: c}
 } 
 
 // Returns the first found valid gallery link, and the amount of tries.

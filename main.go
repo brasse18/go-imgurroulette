@@ -5,17 +5,20 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"gitlab.com/Niesch/go-imgurroulette/imgur"
 )
 
 func main(){
-	var maxtries, minlength, maxlength int
+	var maxtries, minlength, maxlength, cachesize int
 	maxtries = 50
 	minlength = 5
 	maxlength = 7
+	cachesize = 15
 	
 	flag.IntVar(&maxtries, "maxtries", 50, "how many attempts should be made while finding a valid URL")
 	flag.IntVar(&minlength, "minlength", 5, "minimum length of imgur URLs")
 	flag.IntVar(&maxlength, "maxlength", 7, "maximum length of imgur URLs")
+	flag.IntVar(&cachesize, "cachesize", 15, "the amount of items to try to keep cached")
 	debug := flag.Bool("debug", false, "debug to stdout")
 	license := flag.Bool("license", false, "show license information")
 	flag.Parse()
@@ -38,9 +41,23 @@ func main(){
     along with this program.  If not, see <http://www.gnu.org/licenses/>.`)
 		os.Exit(0)
 	}
+
+	i := imgur.New("https://imgur.com/", "https://i.imgur.com/",".png", maxtries, minlength, maxlength, cachesize, *debug)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		indexHandler(w, r, maxtries, minlength, maxlength, *debug)
+		indexHandler(w, r, &i)
 	})
+
+	go func(client *imgur.ImgurAnonymousClient){
+		for {
+			link, tries, err := i.FindValidGalleryLink()
+			if err != nil {
+				i.ErrorLogger.Println(err)
+			}
+			ilink := i.BuildImageLink(link)
+			client.CacheChan <- &imgur.ImgurResult{Link: ilink, Tries: tries}
+		}
+	}(&i)
+
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	http.ListenAndServe(":8080", nil)
 }

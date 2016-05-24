@@ -8,23 +8,17 @@ import (
 )
 
 type Result struct {
-	Link  string
-	Tries int
+	Link        string
+	Tries       int
+	CacheLength int
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request, maxtries int, minlength int, maxlength int, dbg bool) {
-	i := imgur.New("https://imgur.com/", "https://i.imgur.com/",".png", maxtries, minlength, maxlength, dbg)
-
-	link, tries, err := i.FindValidGalleryLink()
-	if err != nil {
-		i.ErrorLogger.Println(err)
-		fmt.Fprintf(w, "Something went wrong. The error has been logged.\n")
-		return
-	}
-	ilink := i.BuildImageLink(link)
+func indexHandler(w http.ResponseWriter, r *http.Request, i *imgur.ImgurAnonymousClient) {
+	
+	imgurResult := <- i.CacheChan
+	result :=  Result{Link: imgurResult.Link, Tries: imgurResult.Tries, CacheLength: len(i.CacheChan)}
 	t := template.Must(template.New("index.html").ParseFiles("assets/index.html"))
-	result := Result{Link: ilink, Tries: tries}
-	err = t.Execute(w, result)
+	err := t.Execute(w, result)
 	if err != nil {
 		i.ErrorLogger.Println(err)
 		fmt.Fprintf(w, "Something went wrong. The error has been logged.\n")

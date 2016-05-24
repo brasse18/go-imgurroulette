@@ -15,7 +15,7 @@ You should also probably put it behind nginx and wrap everything in TLS or somet
 
 ## Running
 - See `go-imgurroulette --help` or `go-imgurroulette -h` for details.
-- The `--workers` flag might increase performance massively. Higher values should be used with a larger `--cachesize`.
+- The `--workers` flag might increase performance massively. Higher values should be used with a larger `--cachesize`. The defaults work well for a single person viewing it over localhost with a decent Internet connection.
 - Generally, the `--workers` flag should be increased with multiple clients viewing. The `--cachesize` flag should generally be increased with faster viewers.
 - Imgur may ban you if you excessively use their services, it's probably in their ToS somewhere. I dunno, I didn't read that shit.
 

@@ -1,21 +1,21 @@
 package imgur
 
 import (
-	"net/http"
-	"math/rand"
-	"time"
 	"fmt"
 	"log"
+	"math/rand"
+	"net/http"
 	"os"
+	"time"
 )
 
 type ImgurAnonymousClient struct {
-	httpClient            http.Client
-	InfoLogger            *log.Logger
-	DebugLogger           *log.Logger
-	ErrorLogger           *log.Logger
-	CacheChan             chan *ImgurResult
-	cfg                   *Config
+	httpClient  http.Client
+	InfoLogger  *log.Logger
+	DebugLogger *log.Logger
+	ErrorLogger *log.Logger
+	CacheChan   chan *ImgurResult
+	cfg         *Config
 }
 
 type Config struct {
@@ -30,19 +30,18 @@ type Config struct {
 }
 
 type ImgurResult struct {
-	Link     string
-	Tries    int
+	Link  string
+	Tries int
 }
 
-
-// Returns a brand spankin' new ImgurAnonymousClient 
-func New(cfg *Config) (*ImgurAnonymousClient) {
+// Returns a brand spankin' new ImgurAnonymousClient
+func New(cfg *Config) *ImgurAnonymousClient {
 	il := log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
 	dl := log.New(os.Stdout, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
 	el := log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
 	c := make(chan *ImgurResult, cfg.CacheSize)
 	return &ImgurAnonymousClient{httpClient: http.Client{}, InfoLogger: il, DebugLogger: dl, ErrorLogger: el, CacheChan: c, cfg: cfg}
-} 
+}
 
 // Returns the first found valid gallery link, and the amount of tries.
 func (client *ImgurAnonymousClient) FindValidGalleryLink() (string, int, error) {
@@ -50,9 +49,9 @@ func (client *ImgurAnonymousClient) FindValidGalleryLink() (string, int, error) 
 	for i = 0; i <= client.cfg.MaxTries; i++ {
 		rand.Seed(time.Now().UTC().UnixNano())
 		// We check against the "album" URL and not the direct file, since accessing a direct removed file will return 200 OK and removed.png.
-		l := (rand.Intn(client.cfg.MaxLength+1 - client.cfg.MinLength) + client.cfg.MinLength)
+		l := (rand.Intn(client.cfg.MaxLength+1-client.cfg.MinLength) + client.cfg.MinLength)
 		s := randomString(l)
-		// yeah, don't hate me 
+		// yeah, don't hate me
 		url := client.cfg.AlbumBaseUrl + s
 		if client.CheckLink(url) == nil {
 			if client.cfg.Debug {
@@ -64,12 +63,12 @@ func (client *ImgurAnonymousClient) FindValidGalleryLink() (string, int, error) 
 	return "", i, fmt.Errorf("Failed to find valid URL")
 }
 
-// Returns the direct image link from string "gallery". 
-func (client *ImgurAnonymousClient) BuildImageLink(gallery string) (string) {
+// Returns the direct image link from string "gallery".
+func (client *ImgurAnonymousClient) BuildImageLink(gallery string) string {
 	return gallery + client.cfg.DefaultFileExtension
 }
 
-// Checks whether url exists or not. Returns nil upon success. 
+// Checks whether url exists or not. Returns nil upon success.
 func (client *ImgurAnonymousClient) CheckLink(url string) error {
 	resp, err := client.httpClient.Head(url)
 	if err != nil {

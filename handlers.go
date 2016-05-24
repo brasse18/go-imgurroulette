@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"html/template"
 	"gitlab.com/Niesch/go-imgurroulette/imgur"
+	"html/template"
+	"net/http"
 )
 
 type Result struct {
@@ -14,9 +14,9 @@ type Result struct {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request, i *imgur.ImgurAnonymousClient) {
-	
-	imgurResult := <- i.CacheChan
-	result :=  Result{Link: imgurResult.Link, Tries: imgurResult.Tries, CacheLength: len(i.CacheChan)}
+
+	imgurResult := <-i.CacheChan
+	result := Result{Link: imgurResult.Link, Tries: imgurResult.Tries, CacheLength: len(i.CacheChan)}
 	t := template.Must(template.New("index.html").ParseFiles("assets/index.html"))
 	err := t.Execute(w, result)
 	if err != nil {

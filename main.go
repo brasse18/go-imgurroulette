@@ -1,20 +1,20 @@
 package main
 
 import (
-	"net/http"
 	"flag"
 	"fmt"
-	"os"
 	"gitlab.com/Niesch/go-imgurroulette/imgur"
+	"net/http"
+	"os"
 )
 
-func main(){
+func main() {
 	var maxtries, minlength, maxlength, cachesize int
 	maxtries = 50
 	minlength = 5
 	maxlength = 7
 	cachesize = 15
-	
+
 	flag.IntVar(&maxtries, "maxtries", 50, "how many attempts should be made while finding a valid URL")
 	flag.IntVar(&minlength, "minlength", 5, "minimum length of imgur URLs")
 	flag.IntVar(&maxlength, "maxlength", 7, "maximum length of imgur URLs")
@@ -43,13 +43,13 @@ func main(){
 	}
 
 	//conf := &
-	
+
 	i := imgur.New(&imgur.Config{DefaultFileExtension: ".png", AlbumBaseUrl: "https://imgur.com/", DirectBaseUrl: "https://i.imgur.com/", MaxTries: maxtries, MinLength: minlength, MaxLength: maxlength, CacheSize: cachesize, Debug: *debug})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		indexHandler(w, r, i)
 	})
 
-	go func(client *imgur.ImgurAnonymousClient){
+	go func(client *imgur.ImgurAnonymousClient) {
 		for {
 			link, tries, err := i.FindValidGalleryLink()
 			if err != nil {

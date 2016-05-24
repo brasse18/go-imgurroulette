@@ -9,16 +9,18 @@ import (
 )
 
 func main() {
-	var maxtries, minlength, maxlength, cachesize int
+	var maxtries, minlength, maxlength, cachesize, workers int
 	maxtries = 50
 	minlength = 5
 	maxlength = 7
 	cachesize = 15
+	workers = 1
 
 	flag.IntVar(&maxtries, "maxtries", 50, "how many attempts should be made while finding a valid URL")
 	flag.IntVar(&minlength, "minlength", 5, "minimum length of imgur URLs")
 	flag.IntVar(&maxlength, "maxlength", 7, "maximum length of imgur URLs")
 	flag.IntVar(&cachesize, "cachesize", 15, "the amount of items to try to keep cached")
+	flag.IntVar(&workers, "workers", 1, "the amount of workers to work on keeping cache filled")
 	debug := flag.Bool("debug", false, "debug to stdout")
 	license := flag.Bool("license", false, "show license information")
 	flag.Parse()
@@ -42,21 +44,26 @@ func main() {
 		os.Exit(0)
 	}
 
-	//conf := &
-
 	i := imgur.New(&imgur.Config{DefaultFileExtension: ".png", AlbumBaseUrl: "https://imgur.com/", DirectBaseUrl: "https://i.imgur.com/", MaxTries: maxtries, MinLength: minlength, MaxLength: maxlength, CacheSize: cachesize, Debug: *debug})
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		indexHandler(w, r, i)
 	})
 
 	go func(client *imgur.ImgurAnonymousClient) {
-		for {
-			link, tries, err := i.FindValidGalleryLink()
-			if err != nil {
-				i.ErrorLogger.Println(err)
+		for j := 0; j < workers; j++ {
+			if client.Cfg.Debug {
+				client.DebugLogger.Printf("Starting worker %d out of %d\n", j, workers)
 			}
-			ilink := i.BuildImageLink(link)
-			client.CacheChan <- &imgur.ImgurResult{Link: ilink, Tries: tries}
+			go func(client *imgur.ImgurAnonymousClient) {
+				for {
+					link, tries, err := client.FindValidGalleryLink()
+					if err != nil {
+						client.ErrorLogger.Println(err)
+					}
+					ilink := client.BuildImageLink(link)
+					client.CacheChan <- &imgur.ImgurResult{Link: ilink, Tries: tries}
+				}
+			}(client)
 		}
 	}(i)
 

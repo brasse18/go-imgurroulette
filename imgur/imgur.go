@@ -73,7 +73,7 @@ func (client ImgurAnonymousClient) CheckLink(url string) error {
 	}
 	if resp.StatusCode == 200 {
 		if client.debug {
-			client.DebugLogger.Println("Found URL: %s\n", url)
+			client.DebugLogger.Printf("Found URL: %s\n", url)
 		}
 		return nil
 	} else {

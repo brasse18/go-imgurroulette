@@ -14,7 +14,7 @@ body{
     transform:translate(-50%,-50%);
 }
 
-img.resize{x
+img.resize{
     height: auto; 
     width: auto; 
     max-width: 80%; 

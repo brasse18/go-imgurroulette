@@ -13,14 +13,14 @@ func main() {
 	maxtries = 50
 	minlength = 5
 	maxlength = 7
-	cachesize = 15
-	workers = 1
+	cachesize = 50
+	workers = 25
 
 	flag.IntVar(&maxtries, "maxtries", 50, "how many attempts should be made while finding a valid URL")
 	flag.IntVar(&minlength, "minlength", 5, "minimum length of imgur URLs")
 	flag.IntVar(&maxlength, "maxlength", 7, "maximum length of imgur URLs")
-	flag.IntVar(&cachesize, "cachesize", 15, "the amount of items to try to keep cached")
-	flag.IntVar(&workers, "workers", 1, "the amount of workers to work on keeping cache filled")
+	flag.IntVar(&cachesize, "cachesize", 50, "the amount of items to try to keep cached")
+	flag.IntVar(&workers, "workers", 25, "the amount of workers to work on keeping cache filled")
 	debug := flag.Bool("debug", false, "debug to stdout")
 	license := flag.Bool("license", false, "show license information")
 	flag.Parse()
